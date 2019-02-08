@@ -2,10 +2,11 @@ const createError = require('http-errors');
 const express = require('express');
 const path = require('path');
 const logger = require('morgan');
-const expressValidator = require('express-validator');
 const session = require('express-session');
 const passport = require('passport');
 const mongoose = require('mongoose');
+const flash = require('connect-flash');
+const bodyParser = require('body-parser');
 const config = require('./config/database');
 
 // connect to mongoDB
@@ -14,7 +15,7 @@ let db = mongoose.connection;
 
 // Check connection
 db.once('open', function(){
-  console.log('Connected to Mongo Database');
+  console.log('Successfully connected to MongoDB');
 });
 
 // Check for DB errors
@@ -25,19 +26,14 @@ db.on('error', function(err){
 // app instantiate
 const app = express();
 
-// define routing
-const indexRouter = require('./routes/index');
-const usersRouter = require('./routes/users');
-const booksRouter = require('./routes/books');
-
-// set routes
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
-app.use('/books', booksRouter);
-
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
+
+// Body Parser Middleware
+// parse application/x-www-form-urlencoded and json
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
 app.use(logger('dev'));
 app.use(express.static(path.join(__dirname, 'public')));
@@ -50,33 +46,32 @@ app.use(session({
 }));
 
 // Express Messages Middleware
+app.use(flash());
 app.use(function (req, res, next) {
   res.locals.messages = require('express-messages')(req, res);
   next();
 });
 
-// Express Validator Middleware
-app.use(expressValidator({
-  errorFormatter: function(param, msg, value) {
-      var namespace = param.split('.')
-      , root    = namespace.shift()
-      , formParam = root;
-
-    while(namespace.length) {
-      formParam += '[' + namespace.shift() + ']';
-    }
-    return {
-      param : formParam,
-      msg   : msg,
-      value : value
-    };
-  }
-}));
+// Passport Config
+require('./config/passport')(passport);
+// Passport Middleware
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.get('*', function(req, res, next){
   res.locals.user = req.user || null;
   next();
 });
+
+// define routing
+const indexRouter = require('./routes/index');
+const usersRouter = require('./routes/users');
+const booksRouter = require('./routes/books');
+
+// set routes
+app.use('/', indexRouter);
+app.use('/users', usersRouter);
+app.use('/books', booksRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
