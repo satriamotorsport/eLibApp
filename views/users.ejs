@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+ <% include partials/head %> 
+</head>
+<body>
+<% include partials/menu %>
+
+<div class="container-fluid bg-3">    
+  <h3><%= page %></h3><br>
+  <div class="row">
+    <ul>
+      <% users.forEach(function(user){%>
+        <li><%= user.name %> <%= user.email %></li>
+      <% }) %>
+    </ul>
+  </div>
+</div>
+
+</body>
+<% include partials/script %>
+</html>

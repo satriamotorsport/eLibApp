@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+ <% include partials/head %> 
+</head>
+<body>
+<% include partials/logo-header %>
+    <div class="col-sm-6 col-sm-offset-3">
+        <h1><span class="fa fa-user"></span> Register</h1>    
+        <form  method="post" action="/users/register">
+            <div class="form-group">
+                <label>Name</label>
+                <input type="text" class="form-control" name="name">
+            </div>               
+            <div class="form-group">
+                <label>Email</label>
+                <input type="text" class="form-control" name="email">
+            </div>
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" class="form-control" name="username">
+            </div>            
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" class="form-control" name="password">
+            </div>  
+            <div class="form-group">      
+                <button type="submit" class="btn btn-warning btn-lg">Register</button>
+                <button type="button" class="btn btn-info btn-lg" onclick="history.back()">Back to Login</button>
+            </div>
+        </form>       
+    </div>
+</body>
+</html>
